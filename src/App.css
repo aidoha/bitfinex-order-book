@@ -1,38 +1,54 @@
-.App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.table-container {
   display: flex;
-  flex-direction: column;
-  align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
 }
 
-.App-link {
-  color: #61dafb;
+.precision-buttons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.order-book-table {
+  width: 60%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 11px;
+}
+
+.order-book-table th,
+.order-book-table td {
+  border: 1px solid #ddd;
+  text-align: right;
+  padding: 8px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.order-book-table th {
+  background-color: #f2f2f2;
+}
+
+.order-book-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+/* Column Widths */
+.col-count {
+  width: 10%;
+}
+.col-amount {
+  width: 15%;
+}
+.col-total {
+  width: 20%;
+}
+.col-price {
+  width: 15%;
+}
+
+
+button:disabled {
+  cursor: not-allowed;
 }
