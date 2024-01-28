@@ -3,10 +3,11 @@
   justify-content: center;
 }
 
-.precision-buttons {
+.buttons {
   display: flex;
   align-items: center;
   gap: 12px;
+  margin: 12px 0;
 }
 
 .order-book-table {
@@ -47,7 +48,6 @@
 .col-price {
   width: 15%;
 }
-
 
 button:disabled {
   cursor: not-allowed;

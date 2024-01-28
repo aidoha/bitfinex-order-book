@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { setBookData, setPrecision } from './store/features/bookSlice';
 import { subscribeToBook } from './bitfinexService';
@@ -25,6 +25,7 @@ const mergeAndTrimOrderBook = (existingOrders, newOrders) => {
 const App = () => {
   const dispatch = useDispatch();
   const { bids, asks, precision } = useSelector((state) => state.book);
+  const [isConnected, setIsConnected] = useState(false);
 
   const onMessage = (msg) => {
     if (msg.event === undefined && msg[1] !== 'hb') {
@@ -45,7 +46,7 @@ const App = () => {
   const increasePrecision = () => {
     if (precision < MAX_PRECISION) {
       const newPrecision = precision + 1;
-      const resubscribe = subscribeToBook(onMessage, PRECISIONS[precision]);
+      const { resubscribe } = subscribeToBook(onMessage, PRECISIONS[precision], setIsConnected);
       resubscribe(PRECISIONS[newPrecision]);
       dispatch(setPrecision(newPrecision));
     }
@@ -54,26 +55,56 @@ const App = () => {
   const decreasePrecision = () => {
     if (precision > MIN_PRECISION) {
       const newPrecision = precision - 1;
-      const resubscribe = subscribeToBook(onMessage, PRECISIONS[precision]);
+      const { resubscribe } = subscribeToBook(onMessage, PRECISIONS[precision], setIsConnected);
       resubscribe(PRECISIONS[newPrecision]);
       dispatch(setPrecision(newPrecision));
     }
   };
 
+  const connectWS = () => {
+    const { resubscribe } = subscribeToBook(onMessage, PRECISIONS[precision], setIsConnected);
+    resubscribe(PRECISIONS[precision]);
+  };
+
+  const disconnectWS = () => {
+    const { disconnectWebSocket } = subscribeToBook(
+      onMessage,
+      PRECISIONS[precision],
+      setIsConnected
+    );
+
+    disconnectWebSocket();
+  };
+
   useEffect(() => {
-    subscribeToBook(onMessage, PRECISIONS[precision]);
+    subscribeToBook(onMessage, PRECISIONS[precision], setIsConnected);
   }, [dispatch, asks, bids]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!isConnected && navigator.onLine) {
+        connectWS();
+      }
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [isConnected]);
 
   return (
     <div>
       <h2>Order Book</h2>
-      <div className="precision-buttons">
+      <div className="buttons">
         <button disabled={precision === MIN_PRECISION} onClick={decreasePrecision}>
           Decrease prec.
         </button>
         <button disabled={precision === MAX_PRECISION} onClick={increasePrecision}>
           Increase prec.
         </button>
+      </div>
+
+      <div className="buttons">
+        <button onClick={connectWS}>Connect</button>
+        <button onClick={disconnectWS}>Disconnect</button>
       </div>
       <div className="table-container">
         <table className="order-book-table">
